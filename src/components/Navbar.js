@@ -1,12 +1,31 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
+import { Auth } from "aws-amplify";
 
 export default class Navbar extends Component {
+  handleLogout = async (event) => {
+    event.preventDefault();
+
+    try {
+      const { auth } = this.props;
+      await Auth.signOut();
+      auth.setAuthStatus(false);
+      auth.setUser(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   render() {
     return (
       <nav className="navbar" role="navigation" aria-label="main navigation">
         <div className="navbar-brand">
           <a className="navbar-item" href="/">
-            <img src="hexal-logo.png" width="112" height="28" alt="hexal logo" />
+            <img
+              src="hexal-logo.png"
+              width="112"
+              height="28"
+              alt="hexal logo"
+            />
           </a>
         </div>
 
@@ -25,18 +44,35 @@ export default class Navbar extends Component {
 
           <div className="navbar-end">
             <div className="navbar-item">
+              {this.props.auth.isAuthenticated && this.props.auth.user && (
+                <p>Hello, {this.props.auth.user.username}</p>
+              )}
+
               <div className="buttons">
-                <a href="/register" className="button is-primary">
-                  <strong>Register</strong>
-                </a>
-                <a href="/login" className="button is-light">
-                  Log in
-                </a>
+                {!this.props.auth.isAuthenticated && (
+                  <>
+                    <a href="/register" className="button is-primary">
+                      <strong>Register</strong>
+                    </a>
+                    <a href="/login" className="button is-light">
+                      Log in
+                    </a>
+                  </>
+                )}
+                {this.props.auth.isAuthenticated && (
+                  <a
+                    href="/"
+                    onClick={this.handleLogout}
+                    className="button is-light"
+                  >
+                    Log out
+                  </a>
+                )}
               </div>
             </div>
           </div>
         </div>
       </nav>
-    )
+    );
   }
 }

@@ -25,6 +25,8 @@ class LogIn extends Component {
   handleSubmit = async (event) => {
     event.preventDefault();
 
+    const { auth, history } = this.props;
+
     // Form validation
     this.clearErrorState();
     const error = Validate(event, this.state);
@@ -38,7 +40,9 @@ class LogIn extends Component {
     try {
       const user = await Auth.signIn(this.state.username, this.state.password);
       console.log(user);
-      this.props.history.push("/");
+      auth.setAuthStatus(true);
+      auth.setUser(user);
+      history.push("/");
     } catch (error) {
       console.log(error);
       let err = null;
